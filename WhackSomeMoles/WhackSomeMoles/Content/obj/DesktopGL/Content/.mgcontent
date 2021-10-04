@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Profile>Reach</Profile>
+  <Platform>DesktopGL</Platform>
+  <Config />
+  <SourceFiles>
+    <File>C:/Users/malmk/source/repos/WhackSomeMoles/WhackSomeMoles/WhackSomeMoles/Content/background.png</File>
+    <File>C:/Users/malmk/source/repos/WhackSomeMoles/WhackSomeMoles/WhackSomeMoles/Content/hole_foreground.png</File>
+    <File>C:/Users/malmk/source/repos/WhackSomeMoles/WhackSomeMoles/WhackSomeMoles/Content/lightning.png</File>
+    <File>C:/Users/malmk/source/repos/WhackSomeMoles/WhackSomeMoles/WhackSomeMoles/Content/mallet.png</File>
+    <File>C:/Users/malmk/source/repos/WhackSomeMoles/WhackSomeMoles/WhackSomeMoles/Content/mole.png</File>
+    <File>C:/Users/malmk/source/repos/WhackSomeMoles/WhackSomeMoles/WhackSomeMoles/Content/mole_hole.png</File>
+    <File>C:/Users/malmk/source/repos/WhackSomeMoles/WhackSomeMoles/WhackSomeMoles/Content/mole_KO.png</File>
+    <File>C:/Users/malmk/source/repos/WhackSomeMoles/WhackSomeMoles/WhackSomeMoles/Content/spritesheet_puff.png</File>
+    <File>C:/Users/malmk/source/repos/WhackSomeMoles/WhackSomeMoles/WhackSomeMoles/Content/spritesheet_stone.png</File>
+  </SourceFiles>
+  <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+  </DestFiles>
+</SourceFileCollection>
