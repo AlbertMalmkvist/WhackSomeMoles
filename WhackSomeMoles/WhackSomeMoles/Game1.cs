@@ -20,17 +20,16 @@ namespace WhackSomeMoles
         public Texture2D puff;
         public Texture2D mole;
 
-        public Vector2 Gameboard1;
-        public Vector2 Gameboard2;
-        public Vector2 Gameboard3;
+        public Vector2 Gameboard;
 
         public int PuffTimer = 0;
         public int PuffDelay = 50;
 
-
         Point FrameSize;
         Point CurrentFrame = new Point(0, 0);
         Point SheetSize = new Point(4, 2);
+
+        public Mole mole;
 
         public Game1()
         {
@@ -63,13 +62,7 @@ namespace WhackSomeMoles
             puff = Content.Load<Texture2D>("spritesheet_puff");
             mole = Content.Load<Texture2D>("mole");
 
-            int Holes = moleHole.Height * 3;
-
-            Gameboard1.Y = background.Height * 3;
-
-            Gameboard2.Y = Gameboard1.Y + Holes;
-
-            Gameboard3.Y = Gameboard2.Y + Holes;
+            Gameboard.Y = background.Height * 3;
 
             int FrameCutY = puff.Height / 2;
             int FrameCutX = puff.Width / 4;
@@ -111,8 +104,8 @@ namespace WhackSomeMoles
 
             spriteBatch.Draw(background, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
             spriteBatch.Draw(puff, Vector2.Zero, new Rectangle(CurrentFrame.X * FrameSize.X, CurrentFrame.Y * FrameSize.Y, FrameSize.X, FrameSize.Y), Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-            spriteBatch.Draw(holeForeground, Gameboard1, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-            spriteBatch.Draw(moleHole, Gameboard1, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+            spriteBatch.Draw(holeForeground, Gameboard, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+            spriteBatch.Draw(moleHole, Gameboard, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
 
             spriteBatch.End();
 
