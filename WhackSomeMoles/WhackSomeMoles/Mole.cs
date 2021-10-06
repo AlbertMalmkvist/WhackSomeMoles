@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TomtProjektWhackAMole
 {
-    class Mole
+    public class Mole
     {
         public Texture2D MoleImg;
 
