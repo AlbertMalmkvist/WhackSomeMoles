@@ -31,3 +31,4 @@ C:\Users\malmk\source\repos\WhackSomeMoles\WhackSomeMoles\WhackSomeMoles\obj\Deb
 C:\Users\malmk\source\repos\WhackSomeMoles\WhackSomeMoles\WhackSomeMoles\obj\Debug\netcoreapp3.1\WhackSomeMoles.dll
 C:\Users\malmk\source\repos\WhackSomeMoles\WhackSomeMoles\WhackSomeMoles\obj\Debug\netcoreapp3.1\WhackSomeMoles.pdb
 C:\Users\malmk\source\repos\WhackSomeMoles\WhackSomeMoles\WhackSomeMoles\obj\Debug\netcoreapp3.1\WhackSomeMoles.genruntimeconfig.cache
+C:\Users\malmk\source\repos\WhackSomeMoles\WhackSomeMoles\WhackSomeMoles\bin\Debug\netcoreapp3.1\Content\Font.xnb

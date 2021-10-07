@@ -5,11 +5,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace TomtProjektWhackAMole
+namespace WhackSomeMoles
 {
     public class Mole
     {
         public Texture2D MoleImg;
+        float posX;
+        float posY;
 
         public Vector2 pos;
         public Vector2 velocity;
@@ -18,20 +20,25 @@ namespace TomtProjektWhackAMole
 
         public Rectangle HitRect;
 
-        public Mole(Texture2D MoleImg, Vector2 pos)
+        public Mole(Texture2D MoleImg, float posX, float posY, Vector2 velocity)
         {
             this.MoleImg = MoleImg;
-            this.pos = pos;
+            this.posX = posX;
+            this.posY = posY;
+
+            this.velocity = velocity;
+            Vector2 pos = new Vector2(posX, posY);
 
             Hittable = false;
         }
 
-        public void UpdateAstroid()
+        public void UpdateMole()
         {
-            HitRect = new Rectangle((int)(pos.X), (int)(pos.Y), MoleImg.Width, MoleImg.Height);
+            velocity = new Vector2(0, -1);
+            HitRect = new Rectangle((int)(posX), (int)(posY), MoleImg.Width, MoleImg.Height);
         }
 
-        public void DrawAstroid(SpriteBatch spriteBatch)
+        public void DrawMole(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(MoleImg, pos, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
         }

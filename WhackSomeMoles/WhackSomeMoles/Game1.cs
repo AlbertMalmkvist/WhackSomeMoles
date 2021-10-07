@@ -12,6 +12,17 @@ namespace WhackSomeMoles
         private SpriteBatch spriteBatch;
         private RenderTarget2D Screen;
 
+        SpriteFont Font;
+
+        enum GameState
+        {
+            Start,
+            Play,
+            End,
+        }
+
+        GameState CurrentGameState;
+
         public Texture2D holeForeground;
         public Texture2D background;
         public Texture2D lightning;
@@ -20,18 +31,30 @@ namespace WhackSomeMoles
         public Texture2D moleKO;
         public Texture2D stone;
         public Texture2D puff;
-        public Texture2D mole;
+        public Texture2D moleImg;
 
         public Vector2 Gameboard;
+        public Vector2 SpawnMole;
+
+        Random rand;
+
+        MouseState mouseState, previousMouseState;
 
         public int PuffTimer = 0;
         public int PuffDelay = 50;
+        public int GameTimer = 600;
+
+        bool Hit;
 
         Point FrameSize;
         Point CurrentFrame = new Point(0, 0);
         Point SheetSize = new Point(4, 2);
 
         public Mole mole;
+
+        Mole[,] moles;
+        Array[,] holes;
+        Array[,] grass;
 
         public Game1()
         {
@@ -54,21 +77,39 @@ namespace WhackSomeMoles
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            CurrentGameState = GameState.Start;
+
             holeForeground = Content.Load<Texture2D>("hole_foreground");
             background = Content.Load<Texture2D>("background");
             lightning = Content.Load<Texture2D>("lightning");
             moleHole = Content.Load<Texture2D>("mole_hole");
             mallet = Content.Load<Texture2D>("mallet");
             moleKO = Content.Load<Texture2D>("mole_KO");
-            stone = Content.Load<Texture2D>("spritesheet_stone");
             puff = Content.Load<Texture2D>("spritesheet_puff");
-            mole = Content.Load<Texture2D>("mole");
+            moleImg = Content.Load<Texture2D>("mole");
+            Font = Content.Load<SpriteFont>("Font");
 
             Gameboard.Y = background.Height * 3;
 
             int FrameCutY = puff.Height / 2;
             int FrameCutX = puff.Width / 4;
             FrameSize = new Point(FrameCutY, FrameCutX);
+
+            moles = new Mole[3, 3];
+            holes = new Array[3, 3];
+            grass = new Array[3, 3];
+            for (int i = 0; i < moles.GetLength(0); i++)
+            {
+                for (int j = 0; j < moles.GetLength(1); j++)
+                {
+                    float SpawnX = j * moleImg.Width;
+                    float SpawnY = i * moleImg.Height + Gameboard.Y;
+
+                    Mole AddMole = new Mole(moleImg, SpawnX, SpawnY);
+
+                    moles[i, j] = AddMole;
+                }
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -77,21 +118,42 @@ namespace WhackSomeMoles
                 Exit();
 
             // TODO: Add your update logic here
-            PuffTimer += gameTime.ElapsedGameTime.Milliseconds;
-            if (PuffTimer > PuffDelay)
+            switch (CurrentGameState)
             {
-                PuffTimer -= PuffDelay;
-                ++CurrentFrame.X;
-                if (CurrentFrame.X >= SheetSize.X)
-                {
-                    CurrentFrame.X = 0;
-                    ++CurrentFrame.Y;
-                    if (CurrentFrame.Y >= SheetSize.Y)
+                case GameState.Start:
+                    if (mouseState.LeftButton == ButtonState.Pressed)
                     {
-                        CurrentFrame.Y = 0;
+                        CurrentGameState = GameState.Play;
                     }
-                }
+                    break;
+                case GameState.Play:
+                    PuffTimer += gameTime.ElapsedGameTime.Milliseconds;
+                    if (PuffTimer > PuffDelay)
+                    {
+                        PuffTimer -= PuffDelay;
+                        ++CurrentFrame.X;
+                        if (CurrentFrame.X >= SheetSize.X)
+                        {
+                            CurrentFrame.X = 0;
+                            ++CurrentFrame.Y;
+                            if (CurrentFrame.Y >= SheetSize.Y)
+                            {
+                                CurrentFrame.Y = 0;
+                            }
+                        }
 
+                    }
+                    break;
+                case GameState.End:
+                    if (mouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        CurrentGameState = GameState.Play;
+                    }
+                    if (mouseState.RightButton == ButtonState.Pressed)
+                    {
+                        Exit();
+                    }
+                    break;
             }
 
             base.Update(gameTime);
@@ -99,15 +161,33 @@ namespace WhackSomeMoles
 
         protected override void Draw(GameTime gameTime)
         {
-            int Holes = moleHole.Width + moleHole.Width + moleHole.Width / 2;
             GraphicsDevice.Clear(new Color(112, 208, 72));
 
+            previousMouseState = mouseState;
+            mouseState = Mouse.GetState();
+
             spriteBatch.Begin();
+            switch (CurrentGameState)
+            {
+                case GameState.Start:
+                    break;
+                case GameState.Play:
+                    break;
+                case GameState.End:
+                    break;
+            }
 
             spriteBatch.Draw(background, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
             spriteBatch.Draw(puff, Vector2.Zero, new Rectangle(CurrentFrame.X * FrameSize.X, CurrentFrame.Y * FrameSize.Y, FrameSize.X, FrameSize.Y), Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-            spriteBatch.Draw(holeForeground, Gameboard, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-            spriteBatch.Draw(moleHole, Gameboard, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+            for (int i = 0; i < moles.GetLength(0); i++)
+            {
+                for (int j = 0; j < moles.GetLength(1); j++)
+                {
+                    spriteBatch.Draw(moleHole, Gameboard, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                    moles[i, j].DrawMole(spriteBatch);
+                    spriteBatch.Draw(holeForeground, Gameboard, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                }
+            }
 
             spriteBatch.End();
 

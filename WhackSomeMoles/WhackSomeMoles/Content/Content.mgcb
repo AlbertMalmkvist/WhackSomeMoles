@@ -25,6 +25,13 @@
 /processorParam:TextureFormat=Color
 /build:background.png
 
+#begin Font.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Font.spritefont
+
 #begin hole_foreground.png
 /importer:TextureImporter
 /processor:TextureProcessor
