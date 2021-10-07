@@ -27,14 +27,13 @@ namespace WhackSomeMoles
             this.posY = posY;
 
             this.velocity = velocity;
-            Vector2 pos = new Vector2(posX, posY);
+             pos = new Vector2(posX, posY);
 
             Hittable = false;
         }
 
         public void UpdateMole()
         {
-            velocity = new Vector2(0, -1);
             HitRect = new Rectangle((int)(posX), (int)(posY), MoleImg.Width, MoleImg.Height);
         }
 
