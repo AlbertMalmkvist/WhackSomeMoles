@@ -60,9 +60,17 @@ namespace WhackSomeMoles
 
         public int PuffTimer = 0;
         public int PuffDelay = 50;
-        public int GameTimer = 600;
+
+        public int GameTimer = 0;
+        public int GameDelay = 1000;
+        public int GameTimeLeft = 60;
+
+        public int Score = 0;
+
+
 
         bool Hit;
+        bool Hitting;
 
         Point FrameSize;
         Point CurrentFrame = new Point(0, 0);
@@ -94,6 +102,7 @@ namespace WhackSomeMoles
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             CurrentGameState = GameState.Start;
+            mouseState = Mouse.GetState();
 
 
             Vector2 velocity = new Vector2(0, 0);
@@ -138,9 +147,10 @@ namespace WhackSomeMoles
                 for (int j = 0; j < moles.GetLength(1); j++)
                 {
                     float SpawnX = j * moleImg.Width * 3;
-                    float SpawnY = i * moleImg.Height * 3 + Gameboard.Y;
+                    float SpawnY = i * moleImg.Height * 5 / 2 + Gameboard.Y;
+                    velocity = new Vector2(0, -10);
 
-                    Mole AddMole = new Mole(moleImg, SpawnX, SpawnY, velocity);
+                    Mole AddMole = new Mole(moleImg, SpawnX, SpawnY, velocity, true);
 
                     moles[i, j] = AddMole;
                 }
@@ -155,16 +165,62 @@ namespace WhackSomeMoles
             previousMouseState = mouseState;
             mouseState = Mouse.GetState();
 
+
             // TODO: Add your update logic here
             switch (CurrentGameState)
             {
                 case GameState.Start:
                     if (mouseState.LeftButton == ButtonState.Pressed)
                     {
+                        GameTimeLeft = 600;
                         CurrentGameState = GameState.Play;
                     }
                     break;
                 case GameState.Play:
+                    if (mouseState.LeftButton == ButtonState.Released)
+                    {
+                        Hitting = false;
+                    }
+                    for (int i = 0; i < moles.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < moles.GetLength(1); j++)
+                        {
+                            moles[i, j].UpdateMole();
+                            if (moles[i,j].HitRect.Contains(mouseState.X, mouseState.Y))
+                            {
+                                if (mouseState.LeftButton == ButtonState.Pressed && Hitting == false)
+                                {
+                                    Hitting = true;
+                                    if (moles[i,j].IsMoleHit(mouseState.X, mouseState.Y))
+                                    {
+                                    Console.WriteLine(i);
+                                    Console.WriteLine(j);
+                                        Score += 10;
+
+                                        float SpawnX = j * moleImg.Width * 3;
+                                        float SpawnY = i * moleImg.Height * 5 / 2 + Gameboard.Y - moleImg.Height * 5 / 2 -1;
+                                        velocity = new Vector2(0, 2);
+
+                                        Mole AddMole = new Mole(moleImg, SpawnX, SpawnY, velocity, false);
+
+                                        moles[i, j] = AddMole;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    GameTimer += gameTime.ElapsedGameTime.Milliseconds;
+                    if (GameTimer > GameDelay)
+                    {
+                        GameTimer -= GameDelay;
+                        GameTimeLeft -= 1;
+                        if (GameTimeLeft == 0)
+                        {
+                            CurrentGameState = GameState.End;
+                        }
+                    }
+
                     PuffTimer += gameTime.ElapsedGameTime.Milliseconds;
                     if (PuffTimer > PuffDelay)
                     {
@@ -201,107 +257,112 @@ namespace WhackSomeMoles
         {
             GraphicsDevice.Clear(new Color(112, 208, 72));
 
+
+            Vector2 SpawnHole = new Vector2(0, 0);
+            SpawnHole = Gameboard;
             spriteBatch.Begin();
-            switch (CurrentGameState)
-            {
-                case GameState.Start:
-                    break;
-                case GameState.Play:
-                    spriteBatch.DrawString(Font, "time:" + GameTimer, Vector2.Zero, Color.Black);
-                    break;
-                case GameState.End:
-                    break;
-            }
 
             spriteBatch.Draw(background, Vector2.Zero, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
             spriteBatch.Draw(puff, Vector2.Zero, new Rectangle(CurrentFrame.X * FrameSize.X, CurrentFrame.Y * FrameSize.Y, FrameSize.X, FrameSize.Y), Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-
-
-            Vector2 SpawnHole = new Vector2(0, 0);
-                        SpawnHole = Gameboard;
-            for (int i = 0; i < moles.GetLength(0); i++)
+            Vector2 timepiece = new Vector2(background.Width, Gameboard.Y / 4);
+            switch (CurrentGameState)
             {
-                for (int j = 0; j < moles.GetLength(1); j++)
-                {
-                    if (i == 0 && j == 0)
+                case GameState.Start:
+                    spriteBatch.DrawString(Font, "Press Left mouse button to start", timepiece / 3, Color.Black);
+                    spriteBatch.DrawString(Font, "Press Left mouse button to start", timepiece / 3, Color.Black);
+                    break;
+                case GameState.Play:
+                    spriteBatch.DrawString(Font, "time:" + GameTimeLeft, timepiece, Color.Black);
+                    timepiece.Y -= background.Height;
+                    spriteBatch.DrawString(Font, "Score:" + Score, timepiece, Color.Black);
+                    for (int i = 0; i < moles.GetLength(0); i++)
                     {
-                        spriteBatch.Draw(holeForeground1, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 1 && j == 0)
-                    {
-                        spriteBatch.Draw(holeForeground2, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 2 && j == 0)
-                    {
-                        spriteBatch.Draw(holeForeground3, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 0 && j == 1)
-                    {
-                        spriteBatch.Draw(holeForeground4, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 1 && j == 1)
-                    {
-                        spriteBatch.Draw(holeForeground5, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 2 && j == 1)
-                    {
-                        spriteBatch.Draw(holeForeground6, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 0 && j == 2)
-                    {
-                        spriteBatch.Draw(holeForeground7, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 1 && j == 2)
-                    {
-                        spriteBatch.Draw(holeForeground8, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 2 && j == 2)
-                    {
-                        spriteBatch.Draw(holeForeground9, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
+                        for (int j = 0; j < moles.GetLength(1); j++)
+                        {
+                            if (i == 0 && j == 0)
+                            {
+                                spriteBatch.Draw(moleHole1, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 1 && j == 0)
+                            {
+                                spriteBatch.Draw(moleHole2, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 2 && j == 0)
+                            {
+                                spriteBatch.Draw(moleHole3, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 0 && j == 1)
+                            {
+                                spriteBatch.Draw(moleHole4, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 1 && j == 1)
+                            {
+                                spriteBatch.Draw(moleHole5, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 2 && j == 1)
+                            {
+                                spriteBatch.Draw(moleHole6, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 0 && j == 2)
+                            {
+                                spriteBatch.Draw(moleHole7, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 1 && j == 2)
+                            {
+                                spriteBatch.Draw(moleHole8, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 2 && j == 2)
+                            {
+                                spriteBatch.Draw(moleHole9, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
 
-                    moles[i, j].DrawMole(spriteBatch);
+                            moles[i, j].DrawMole(spriteBatch);
 
-                    if (i == 0 && j == 0)
-                    {
-                        spriteBatch.Draw(moleHole1, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            if (i == 0 && j == 0)
+                            {
+                                spriteBatch.Draw(holeForeground1, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 1 && j == 0)
+                            {
+                                spriteBatch.Draw(holeForeground2, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 2 && j == 0)
+                            {
+                                spriteBatch.Draw(holeForeground3, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 0 && j == 1)
+                            {
+                                spriteBatch.Draw(holeForeground4, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 1 && j == 1)
+                            {
+                                spriteBatch.Draw(holeForeground5, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 2 && j == 1)
+                            {
+                                spriteBatch.Draw(holeForeground6, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 0 && j == 2)
+                            {
+                                spriteBatch.Draw(holeForeground7, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 1 && j == 2)
+                            {
+                                spriteBatch.Draw(holeForeground8, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+                            if (i == 2 && j == 2)
+                            {
+                                spriteBatch.Draw(holeForeground9, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
+                            }
+
+                            SpawnHole.X += moleImg.Width * 3;
+                        }
+                        SpawnHole.Y += moleImg.Height * 5 / 2;
+                        SpawnHole.X = Gameboard.X;
                     }
-                    if (i == 1 && j == 0)
-                    {
-                        spriteBatch.Draw(moleHole2, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 2 && j == 0)
-                    {
-                        spriteBatch.Draw(moleHole3, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 0 && j == 1)
-                    {
-                        spriteBatch.Draw(moleHole4, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 1 && j == 1)
-                    {
-                        spriteBatch.Draw(moleHole5, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 2 && j == 1)
-                    {
-                        spriteBatch.Draw(moleHole6, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 0 && j == 2)
-                    {
-                        spriteBatch.Draw(moleHole7, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 1 && j == 2)
-                    {
-                        spriteBatch.Draw(moleHole8, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    if (i == 2 && j == 2)
-                    {
-                        spriteBatch.Draw(moleHole9, SpawnHole, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
-                    }
-                    SpawnHole.X += moleImg.Width * 3;
-                }
-                SpawnHole.Y += moleImg.Height * 5 / 2;
-                SpawnHole.X = Gameboard.X;
+                    break;
+                case GameState.End:
+                    break;
             }
             spriteBatch.End();
 
