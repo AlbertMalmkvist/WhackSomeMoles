@@ -64,6 +64,8 @@ namespace WhackSomeMoles
         public int GameTimer = 0;
         public int GameDelay = 1000;
         public int GameTimeLeft = 60;
+        public int MoveMoleTimer = 2;
+        public int LeaveMoleTimer = 0;
 
         public int Score = 0;
 
@@ -104,9 +106,7 @@ namespace WhackSomeMoles
             CurrentGameState = GameState.Start;
             mouseState = Mouse.GetState();
 
-
-            Vector2 velocity = new Vector2(0, 0);
-
+            rand = new Random();
 
             holeForeground1 = Content.Load<Texture2D>("hole_foreground");
             holeForeground2 = Content.Load<Texture2D>("hole_foreground");
@@ -148,9 +148,9 @@ namespace WhackSomeMoles
                 {
                     float SpawnX = j * moleImg.Width * 3;
                     float SpawnY = i * moleImg.Height * 5 / 2 + Gameboard.Y;
-                    velocity = new Vector2(0, -10);
+                    velocity = new Vector2(0, 0);
 
-                    Mole AddMole = new Mole(moleImg, SpawnX, SpawnY, velocity, true);
+                    Mole AddMole = new Mole(moleImg, SpawnX, SpawnY, velocity, false);
 
                     moles[i, j] = AddMole;
                 }
@@ -172,7 +172,7 @@ namespace WhackSomeMoles
                 case GameState.Start:
                     if (mouseState.LeftButton == ButtonState.Pressed)
                     {
-                        GameTimeLeft = 600;
+                        GameTimeLeft = 60;
                         CurrentGameState = GameState.Play;
                     }
                     break;
@@ -186,19 +186,17 @@ namespace WhackSomeMoles
                         for (int j = 0; j < moles.GetLength(1); j++)
                         {
                             moles[i, j].UpdateMole();
-                            if (moles[i,j].HitRect.Contains(mouseState.X, mouseState.Y))
+                            if (moles[i, j].HitRect.Contains(mouseState.X, mouseState.Y))
                             {
                                 if (mouseState.LeftButton == ButtonState.Pressed && Hitting == false)
                                 {
                                     Hitting = true;
-                                    if (moles[i,j].IsMoleHit(mouseState.X, mouseState.Y))
+                                    if (moles[i, j].IsMoleHit(mouseState.X, mouseState.Y))
                                     {
-                                    Console.WriteLine(i);
-                                    Console.WriteLine(j);
                                         Score += 10;
 
                                         float SpawnX = j * moleImg.Width * 3;
-                                        float SpawnY = i * moleImg.Height * 5 / 2 + Gameboard.Y - moleImg.Height * 5 / 2 -1;
+                                        float SpawnY = i * moleImg.Height * 5 / 2;
                                         velocity = new Vector2(0, 2);
 
                                         Mole AddMole = new Mole(moleImg, SpawnX, SpawnY, velocity, false);
@@ -215,9 +213,59 @@ namespace WhackSomeMoles
                     {
                         GameTimer -= GameDelay;
                         GameTimeLeft -= 1;
+                        MoveMoleTimer += 1;
                         if (GameTimeLeft == 0)
                         {
                             CurrentGameState = GameState.End;
+                        }
+                    }
+                    for (int i = 0; i < moles.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < moles.GetLength(1); j++)
+                        {
+                            if (moles[i,j].HittableCheck())
+                            {
+                                if (moles[i,j].MoleLeave(1))
+                                {
+                                float SpawnX = j * moleImg.Width * 3;
+                                float SpawnY = i * moleImg.Height * 5 / 2;
+                                velocity = new Vector2(0, 4);
+
+                                Mole AddMole = new Mole(moleImg, SpawnX, SpawnY, velocity, false);
+
+                                moles[i, j] = AddMole;
+                                }
+
+                            }
+                        }
+                    }
+
+                    if (MoveMoleTimer == 3)
+                    {
+                        MoveMoleTimer -= 3;
+                        int Yran = rand.Next(0, 2);
+                        int Xran = rand.Next(0, 2);
+                        for (int i = 0; i < moles.GetLength(0); i++)
+                        {
+                            for (int j = 0; j < moles.GetLength(1); j++)
+                            {
+                                if (Yran == j && Xran == i)
+                                {
+                                    if (moles[i, j].IsMoleHittable())
+                                    {
+                                        float SpawnX = j * moleImg.Width * 3;
+                                        float SpawnY = i * moleImg.Height * 5 / 2 + Gameboard.Y;
+                                        int MoveRan = rand.Next(-3, -1);
+                                        velocity = new Vector2(0, MoveRan);
+
+                                        Mole AddMole = new Mole(moleImg, SpawnX, SpawnY, velocity, true);
+
+                                        moles[i, j] = AddMole;
+                                    }
+
+                                }
+
+                            }
                         }
                     }
 
@@ -241,6 +289,7 @@ namespace WhackSomeMoles
                 case GameState.End:
                     if (mouseState.LeftButton == ButtonState.Pressed)
                     {
+                        GameTimeLeft = 60;
                         CurrentGameState = GameState.Play;
                     }
                     if (mouseState.RightButton == ButtonState.Pressed)

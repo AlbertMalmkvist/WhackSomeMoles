@@ -13,9 +13,9 @@ namespace WhackSomeMoles
         float posX;
         float posY;
 
+        int timer = 0;
 
         public Vector2 Peakpos;
-        public Vector2 Bottompos;
         public Vector2 pos;
         public Vector2 velocity;
 
@@ -28,12 +28,10 @@ namespace WhackSomeMoles
             this.MoleImg = MoleImg;
             this.posX = posX;
             this.posY = posY;
-
             this.velocity = velocity;
             pos = new Vector2(posX, posY);
-            Bottompos = pos;
             Peakpos.Y = pos.Y - MoleImg.Height* 2;
-
+            timer = 0;
             this.Hittable = Hittable;
         }
         public void UpdateMole()
@@ -50,17 +48,30 @@ namespace WhackSomeMoles
             spriteBatch.Draw(MoleImg, pos, null, Color.White, 0, Vector2.Zero, 3f, SpriteEffects.None, 0);
         }
 
-        public bool IsMoleHittable(int x, int y)
+        public bool MoleLeave(int time)
         {
-            bool Hit = false;
-            Rectangle rect = new Rectangle((int)(pos.X), (int)(pos.Y), MoleImg.Width, MoleImg.Height);
-
-            if (HitRect.Contains(x, y))
+            bool leave =false;
+            timer += time;
+            if (timer ==400)
             {
-                Hit = true;
-                Hittable = false;
+                leave = true;
             }
-            return Hit;
+            return leave;
+        }
+        public bool HittableCheck()
+        {
+            return Hittable;
+        }
+        public bool IsMoleHittable()
+        {
+            bool Move = false;
+
+            if (Hittable == false)
+            {
+                Move = true;
+                Hittable = true;
+            }
+            return Move;
         }
 
         public bool IsMoleHit(int x, int y)
